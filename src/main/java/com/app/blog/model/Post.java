@@ -1,8 +1,6 @@
 package com.app.blog.model;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.ColumnDefault;
-
 import java.time.Instant;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -28,13 +26,23 @@ public class Post {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ColumnDefault("current_timestamp()")
-    @Column(name = "created_at", nullable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
-    @ColumnDefault("current_timestamp()")
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        Instant now = Instant.now();
+        createdAt = now;  // Ustawiane tylko raz, przy tworzeniu
+        updatedAt = now;  // Ustawiane również przy tworzeniu
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = Instant.now();  // Aktualizowane przy każdej zmianie
+    }
 
     @OneToMany(mappedBy = "post")
     private Set<Comment> comments = new LinkedHashSet<>();
