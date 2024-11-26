@@ -1,30 +1,42 @@
 package com.app.blog.controller;
 
 import com.app.blog.model.Post;
-import com.app.blog.repository.PostRepository;
+import com.app.blog.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.*;
 
-@Controller
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/posts")
 public class PostController {
 
     @Autowired
-    private PostRepository postRepository;
+    private PostService postService;
 
+    @GetMapping()
 
-    @GetMapping("/addPost")
-    public String showForm(Model model) {
-        model.addAttribute("post", new Post());
-        return "addPost";
+    public List<Post> getAllPersons() {
+        return postService.getAllPosts();
     }
 
-    @PostMapping("/addPost")
-    public String submitForm(@ModelAttribute Post post) {
-        postRepository.save(post);
-        return "redirect:/";
+    @GetMapping("/{id}")
+    public Post getPostById(@PathVariable Long id) {
+        return postService.getPostById(id).orElseThrow();
+    }
+
+    @PostMapping
+    public Post createPost(@RequestBody Post post) {
+        return postService.savePost(post);
+    }
+
+    @PutMapping("/{id}")
+    public Post updatePost(@PathVariable Long id, @RequestBody Post postDetails) {
+        return postService.updatePost(id, postDetails);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deletePost(@PathVariable Long id) {
+        postService.deletePost(id);
     }
 }
