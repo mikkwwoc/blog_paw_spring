@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Blog</title>
+</head>
+<body>
+
+    <h3 th:text="${post.title}"></h3>
+    <p th:text="${post.content}"></p>
+
+
+    <h2>Edycja posta</h2>
+    <form action="#" th:action="@{/updatePost}" th:object="${post}" method="post">
+        <input type="hidden" th:field="*{id}" />
+        <label for="title">Tytuł:</label>
+        <input type="text" th:field="*{title}" />
+        <label for="content">Treść:</label>
+        <textarea th:field="*{content}"></textarea>
+        <button type="submit">Edytuj post</button>
+    </form>
+</body>
+</html>
