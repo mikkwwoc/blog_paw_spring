@@ -7,9 +7,13 @@
 <ul>
   <li th:each="post : ${posts}">
     <h3 th:text="${post.title}"></h3>
+    <a th:href="@{'/posts/' + ${post.id}}">Zobacz</a>
     <p th:text="${post.content}"></p>
     <a th:href="@{'/posts/edit/' + ${post.id}}">Edytuj</a>
-    <a th:href="@{'/posts/delete/' + ${post.id}}">Usuń</a>
+    <form action="#" th:action="@{'/posts/delete/' + ${post.id}} " method="post">
+        <a th:href="@{'/posts/delete/' + ${post.id}}">Usuń</a>
+        <button type="submit">Usun POST</button>
+    </form>
   </li>
 </ul>
 </body>

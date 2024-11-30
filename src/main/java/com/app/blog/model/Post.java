@@ -1,5 +1,6 @@
 package com.app.blog.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import java.time.Instant;
 import java.util.LinkedHashSet;
@@ -45,7 +46,13 @@ public class Post {
     }
 
     @OneToMany(mappedBy = "post")
+    @JsonManagedReference
     private Set<Comment> comments = new LinkedHashSet<>();
+
+    public void addComment(Comment comment) {
+        comments.add(comment);
+        comment.setPost(this);
+    }
 
     @ManyToMany(mappedBy = "posts")
     private Set<Category> categories = new LinkedHashSet<>();

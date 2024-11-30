@@ -1,5 +1,8 @@
 package com.app.blog.controller;
 
+import com.app.blog.model.Comment;
+import com.app.blog.repository.CommentRepository;
+import com.app.blog.service.CommentService;
 import com.app.blog.service.PostService;
 import com.app.blog.model.Post;
 import com.app.blog.repository.PostRepository;
@@ -21,6 +24,12 @@ public class PostWebController {
 
     @Autowired
     private PostService postService;
+
+    @Autowired
+    private CommentService commentService;
+
+    @Autowired
+    private CommentRepository commentRepository;
 
     @GetMapping("/posts/new")
     public String showForm(Model model) {
@@ -50,5 +59,31 @@ public class PostWebController {
     public String updatePost(@ModelAttribute Post post) {
         postService.updatePost(post.getId(), post);
         return "redirect:/posts";
+    }
+
+    @PostMapping("/posts/delete/{id}")
+    public String deletePost(@PathVariable Long id) {
+        postService.deletePost(id);
+        return "redirect:/posts";
+    }
+
+    @GetMapping("/posts/{id}")
+    public String showPost(@PathVariable Long id, Model model) {
+        Post post = postRepository.findById(id).orElseThrow();
+        model.addAttribute("post", post);
+        model.addAttribute("comment", new Comment());
+
+        return "showPost";
+    }
+
+    @PostMapping("/posts/{id}/comments")
+    public String addComment(@PathVariable Long id, @ModelAttribute Comment comment) {
+        Post post = postRepository.findById(id).orElseThrow(() -> new RuntimeException("Nie znaleziono posta z id: " + id));
+
+        comment.setId(null);
+        comment.setPost(post);
+        commentRepository.save(comment);
+
+        return "redirect:/posts/" + id;
     }
 }
