@@ -36,16 +36,16 @@ public class Post {
     @PrePersist
     protected void onCreate() {
         Instant now = Instant.now();
-        createdAt = now;  // Ustawiane tylko raz, przy tworzeniu
-        updatedAt = now;  // Ustawiane również przy tworzeniu
+        createdAt = now;
+        updatedAt = now;
     }
 
     @PreUpdate
     protected void onUpdate() {
-        updatedAt = Instant.now();  // Aktualizowane przy każdej zmianie
+        updatedAt = Instant.now();
     }
 
-    @OneToMany(mappedBy = "post")
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private Set<Comment> comments = new LinkedHashSet<>();
 
