@@ -1,20 +1,101 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head><title>Lista postów</title></head>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista Postów</title>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-blue-grey.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background-color: #f1f1f1;
+        }
+        .posts-container {
+            max-width: 800px;
+            margin: 20px auto;
+        }
+        .post-card {
+            background-color: #fff;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+        .post-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .post-title {
+            margin: 0;
+            font-size: 1.5em;
+        }
+        .post-actions a,
+        .post-actions button {
+            margin-left: 8px;
+        }
+        .post-content {
+            margin-top: 12px;
+            color: #555;
+        }
+        .new-post-link {
+            display: block;
+            text-align: right;
+            margin-bottom: 20px;
+        }
+        .new-post-link a {
+            text-decoration: none;
+            font-size: 1em;
+            font-weight: bold;
+            color: #ffffff;
+            background-color: #4CAF50;
+            padding: 10px 20px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        .new-post-link a:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
 <body>
-<h1>Lista postów</h1>
-<a href="/posts/new">Dodaj nowy post</a>
-<ul>
-  <li th:each="post : ${posts}">
-    <h3 th:text="${post.title}"></h3>
-    <a th:href="@{'/posts/' + ${post.id}}">Zobacz</a>
-    <p th:text="${post.content}"></p>
-    <a th:href="@{'/posts/edit/' + ${post.id}}">Edytuj</a>
-    <form action="#" th:action="@{'/posts/delete/' + ${post.id}} " method="post">
-        <a th:href="@{'/posts/delete/' + ${post.id}}">Usuń</a>
-        <button type="submit">Usun POST</button>
-    </form>
-  </li>
-</ul>
+
+<!--<div th:insert="fragments/header :: header"></div>-->
+
+<div class="w3-container w3-theme-d4 w3-padding-16">
+    <h1 class="w3-center">Lista Postów</h1>
+</div>
+
+<div class="posts-container">
+    <div class="new-post-link">
+        <a href="/posts/new"><i class="fa fa-plus"></i> Dodaj nowy post</a>
+    </div>
+
+    <div th:each="post : ${posts}" class="post-card">
+        <div class="post-header">
+            <h3 class="post-title" th:text="${post.title}"></h3>
+            <p class="post-meta">
+                <span>Autor: </span>
+                <span th:text="${post.getAuthorName()}">NIEZNANY UŻYTKOWNIK</span>
+            </p>
+            <div class="post-actions">
+                <a class="w3-button w3-small w3-theme-d1" th:href="@{'/posts/' + ${post.id}}"><i class="fa fa-eye"></i> Zobacz</a>
+                <a class="w3-button w3-small w3-theme-d3"
+                   th:href="@{'/posts/edit/' + ${post.id}}"
+                   sec:authorize="hasAnyRole('ADMIN', 'MODERATOR')">
+                    <i class="fa fa-pencil"></i> Edytuj
+                </a>
+                <form action="#" th:action="@{'/posts/delete/' + ${post.id}}" method="post" style="display:inline;"
+                      sec:authorize="hasAnyRole('ADMIN', 'MODERATOR')">
+                    <button class="w3-button w3-small w3-red" type="submit"><i class="fa fa-trash"></i> Usuń</button>
+                </form>
+            </div>
+        </div>
+        <p class="post-content" th:text="${post.content}"></p>
+    </div>
+</div>
+
 </body>
 </html>

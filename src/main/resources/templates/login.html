@@ -1,23 +1,72 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="pl">
 <head>
-    <title>Blog - logowanie</title>
+    <title>W3.CSS Template</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-blue-grey.css">
+    <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Open+Sans'>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background-color: #f1f1f1;
+        }
+        .login-container {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+        }
+        .login-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .w3-button {
+            width: 100%;
+        }
+        .login-footer {
+            text-align: center;
+            margin-top: 10px;
+        }
+        .login-footer a {
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
-<h1>Zaloguj się</h1>
-<form th:action="@{/login}" method="post">
-    <div>
-        <label for="username">Nazwa użytkownika:</label>
-        <input type="text" id="username" name="username" required>
+
+<div class="w3-container w3-theme-d4 w3-padding-16">
+    <h2 class="w3-center">Strona Logowania</h2>
+</div>
+
+<div class="login-container w3-card">
+    <div class="login-header">
+        <h3>Zaloguj się</h3>
     </div>
-    <div>
-        <label for="password">Hasło:</label>
-        <input type="password" id="password" name="password" required>
+    <form th:action="@{/login}" method="post" class="w3-container">
+        <p>
+            <label for="username"><b>Nazwa użytkownika</b></label>
+            <input class="w3-input w3-border w3-round" id="username" name="username" type="text" required>
+        </p>
+        <p>
+            <label for="password"><b>Hasło</b></label>
+            <input class="w3-input w3-border w3-round" id="password" name="password" type="password" required>
+        </p>
+        <p>
+            <button class="w3-button w3-theme w3-round w3-large" type="submit">
+                <i class="fa fa-sign-in"></i> Zaloguj się
+            </button>
+        </p>
+    </form>
+    <div class="login-footer">
+        <p>Nie masz konta? <a th:href="@{/register}" class="w3-text-theme">Zarejestruj się</a></p>
     </div>
-    <div>
-        <button type="submit">Login</button>
-    </div>
-</form>
-<p>Nie masz konta? <a th:href="@{/register}">Zarejestruj się</a></p>
+</div>
+
 </body>
 </html>

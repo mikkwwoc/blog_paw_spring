@@ -1,10 +1,45 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="pl">
-
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Blog</title>
+    <title>W3.CSS Template</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-blue-grey.css">
+    <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Open+Sans'>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background-color: #f1f1f1;
+        }
+        .login-container {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+        }
+        .login-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .w3-button {
+            width: 100%;
+        }
+        .login-footer {
+            text-align: center;
+            margin-top: 10px;
+        }
+        .login-footer a {
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
+<div th:insert="fragments/header :: header"></div>
 <h1 th:text="${message}"></h1>
 <h2>Pisz posty, komentuj itp</h2>
 <br><br>

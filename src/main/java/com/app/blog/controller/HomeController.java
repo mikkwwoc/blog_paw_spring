@@ -7,9 +7,9 @@ import org.springframework.ui.Model;
 @Controller
 public class HomeController {
 
-    @GetMapping("/")
+    @GetMapping("/index")
     public String get (Model model) {
         model.addAttribute("message", "Blog");
-        return "index";
+        return "Posts";
     }
 }

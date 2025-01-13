@@ -1,31 +1,80 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Blog - rejestracja</title>
+    <title>W3.CSS Template</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-blue-grey.css">
+    <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Open+Sans'>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background-color: #f1f1f1;
+        }
+        .register-container {
+            max-width: 450px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+        }
+        .register-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .w3-button {
+            width: 100%;
+        }
+        .register-footer {
+            text-align: center;
+            margin-top: 10px;
+        }
+        .register-footer a {
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
-<h1>Zarejestruj się</h1>
-<form th:action="@{/register}" method="post">
-    <div>
-        <label for="username">Nazwa użytkownika:</label>
-        <input type="text" id="username" name="username" required>
+
+<div class="w3-container w3-theme-d4 w3-padding-16">
+    <h2 class="w3-center">Rejestracja</h2>
+</div>
+
+<div class="register-container w3-card">
+    <div class="register-header">
+        <h3>Zarejestruj się</h3>
     </div>
-    <div>
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required>
+    <form th:action="@{/register}" method="post" class="w3-container">
+        <p>
+            <label for="username"><b>Nazwa użytkownika</b></label>
+            <input class="w3-input w3-border w3-round" id="username" name="username" type="text" required>
+        </p>
+        <p>
+            <label for="email"><b>Email</b></label>
+            <input class="w3-input w3-border w3-round" id="email" name="email" type="email" required>
+        </p>
+        <p>
+            <label for="password"><b>Hasło</b></label>
+            <input class="w3-input w3-border w3-round" id="password" name="password" type="password" required>
+        </p>
+        <p>
+            <label for="confirmPassword"><b>Powtórz hasło</b></label>
+            <input class="w3-input w3-border w3-round" id="confirmPassword" name="confirmPassword" type="password" required>
+        </p>
+        <p>
+            <button class="w3-button w3-theme w3-round w3-large" type="submit">
+                <i class="fa fa-user-plus"></i> Zarejestruj się
+            </button>
+        </p>
+    </form>
+    <div class="register-footer">
+        <p>Masz już konto? <a th:href="@{/login}" class="w3-text-theme">Zaloguj się</a></p>
     </div>
-    <div>
-        <label for="password">Hasło:</label>
-        <input type="password" id="password" name="password" required>
-    </div>
-    <div>
-        <label for="confirmPassword">Powtórz hasło:</label>
-        <input type="password" id="confirmPassword" name="confirmPassword" required>
-    </div>
-    <div>
-        <button type="submit">Zarejestruj się</button>
-    </div>
-</form>
-<p>Masz już konto?<a th:href="@{/login}">Zaloguj się</a></p>
+</div>
+
 </body>
 </html>

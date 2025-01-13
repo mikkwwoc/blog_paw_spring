@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link th:href="@{/vendor/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
+
+    <link rel="stylesheet" th:href="@{/css/fontawesome.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/owl.css}">
+    <link rel="stylesheet" th:href="@{/css/animate.css}">
+
+    <title>Rejestracja</title>
+</head>
+<body>
+<h1>Lista Użytkowników</h1>
+<table border="1">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Nazwa Użytkownika</th>
+        <th>Email</th>
+        <th>Role</th>
+        <th>Akcje</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="user : ${users}">
+        <td th:text="${user.id}">1</td>
+        <td th:text="${user.username}">example</td>
+        <td th:text="${user.email}">example@email.com</td>
+        <td>
+            <ul>
+                <li th:each="role : ${user.role}" th:text="${role.name}">ROLE_USER</li>
+            </ul>
+        </td>
+        <td>
+            <a th:href="@{/admin/users/{id}/edit(id=${user.id})}">Zmień Rolę</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

@@ -45,6 +45,11 @@ public class Comment {
         this.id = id;
     }
 
+    public String getAuthorName() {
+        return (user != null && user.getUsername() != null) ? user.getUsername() : "NIEZNANY UŻYTKOWNIK";
+    }
+
+
     public String getContent() {
         return content;
     }

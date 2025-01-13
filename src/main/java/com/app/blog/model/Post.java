@@ -49,6 +49,10 @@ public class Post {
     @JsonManagedReference
     private Set<Comment> comments = new LinkedHashSet<>();
 
+    public String getAuthorName() {
+        return (user != null && user.getUsername() != null) ? user.getUsername() : "NIEZNANY UŻYTKOWNIK";
+    }
+
     public void addComment(Comment comment) {
         comments.add(comment);
         comment.setPost(this);
