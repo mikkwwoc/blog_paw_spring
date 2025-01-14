@@ -91,10 +91,10 @@
     </style>
 </head>
 <body>
-
+<div th:insert="fragments/header :: header"></div>
 <div class="container">
     <h1>Dodaj Nowy Post</h1>
-    <form action="#" th:action="@{/addPost}" th:object="${post}" method="post">
+    <form action="#" th:action="@{/addPost}" th:object="${post}" method="post" enctype="multipart/form-data">
         <!-- Tytuł posta -->
         <label for="title">Tytuł:</label>
         <input type="text" th:field="*{title}" placeholder="Wpisz tytuł posta" required/>
@@ -102,6 +102,10 @@
         <!-- Treść posta -->
         <label for="content">Treść:</label>
         <textarea th:field="*{content}" placeholder="Wpisz treść posta" required></textarea>
+
+        <!-- Obrazek -->
+        <label for="image_path">Dodaj obrazek:</label>
+        <input type="file" id="image_path" name="image" accept="image/*" required>
 
         <div class="form-actions">
             <!-- Przycisk dodania posta -->

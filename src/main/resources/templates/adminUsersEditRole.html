@@ -14,6 +14,8 @@
     <title>Rejestracja</title>
 </head>
 <body>
+<!--<div th:insert="fragments/header :: header"></div>-->
+
 <h1>Zmień Rolę Użytkownika</h1>
 <form th:action="@{/admin/users/{id}/edit(id=${userId})}" method="post">
     <label for="role">Wybierz nową rolę:</label>

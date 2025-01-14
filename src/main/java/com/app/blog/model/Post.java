@@ -23,6 +23,9 @@ public class Post {
     @Column(name = "content", nullable = false)
     private String content;
 
+    @Column(name = "image_path")
+    private String imagePath;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
@@ -61,6 +64,7 @@ public class Post {
     @ManyToMany(mappedBy = "posts")
     private Set<Category> categories = new LinkedHashSet<>();
 
+    // Getters and Setters
     public Long getId() {
         return id;
     }
@@ -83,6 +87,14 @@ public class Post {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
     }
 
     public User getUser() {
@@ -124,5 +136,4 @@ public class Post {
     public void setCategories(Set<Category> categories) {
         this.categories = categories;
     }
-
 }

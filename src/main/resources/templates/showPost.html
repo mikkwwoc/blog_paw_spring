@@ -85,21 +85,36 @@
         .add-comment-form button:hover {
             background-color: #45a049;
         }
+        .post-image {
+            width: 100%;
+            max-width: 800px;
+            height: auto;
+            margin-top: 20px;
+        }
+
     </style>
 </head>
 <body>
 
-<div class="w3-container w3-theme-d4 w3-padding-16">
-    <h1 class="w3-center">Post: <span th:text="${post.title}"></span></h1>
-</div>
+<div th:insert="fragments/header :: header"></div>
+
+<!--<div class="w3-container w3-theme-d4 w3-padding-16">-->
+<!--    <h1 class="w3-center">Post: <span th:text="${post.title}"></span></h1>-->
+<!--</div>-->
 
 <div class="post-container">
     <div class="post-header">
-        <h2 class="post-title" th:text="${post.title}"></h2>
         <p class="post-meta">
             <span>Autor: </span>
             <span th:text="${post.getAuthorName()}">NIEZNANY UŻYTKOWNIK</span>
+            <span>Data: </span>
+            <span th:text="${#temporals.format(post.getCreatedAt(), 'dd-MM-yyyy HH:mm')}"></span>
         </p>
+        <h2 class="post-title" th:text="${post.title}"></h2>
+    </div>
+
+    <div class="post-image-container">
+        <img th:src="@{'/uploads/' + ${post.imagePath}}" alt="Obrazek posta" class="post-image">
     </div>
 
     <div class="post-content">
@@ -112,6 +127,9 @@
             <p class="post-meta">
                 <span>Autor: </span>
                 <span th:text="${comment.getAuthorName()}">NIEZNANY UŻYTKOWNIK</span>
+
+                <span>Data: </span>
+                <span th:text="${#temporals.format(comment.getCreatedAt(), 'dd-MM-yyyy HH:mm')}"></span>
             </p>
             <p th:text="${comment.content}"></p>
         </div>

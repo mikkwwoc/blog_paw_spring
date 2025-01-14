@@ -58,13 +58,16 @@
         .new-post-link a:hover {
             background-color: #45a049;
         }
+        .margin-top-6ch {
+            margin-top:6ch;
+        }
     </style>
 </head>
 <body>
 
-<!--<div th:insert="fragments/header :: header"></div>-->
+<div th:insert="fragments/header :: header"></div>
 
-<div class="w3-container w3-theme-d4 w3-padding-16">
+<div class="w3-container w3-theme-d4 w3-padding-16 margin-top-6ch">
     <h1 class="w3-center">Lista Postów</h1>
 </div>
 
@@ -79,6 +82,8 @@
             <p class="post-meta">
                 <span>Autor: </span>
                 <span th:text="${post.getAuthorName()}">NIEZNANY UŻYTKOWNIK</span>
+                <span>Data: </span>
+                <span th:text="${#temporals.format(post.getCreatedAt(), 'dd-MM-yyyy HH:mm')}"></span>
             </p>
             <div class="post-actions">
                 <a class="w3-button w3-small w3-theme-d1" th:href="@{'/posts/' + ${post.id}}"><i class="fa fa-eye"></i> Zobacz</a>
@@ -92,6 +97,11 @@
                     <button class="w3-button w3-small w3-red" type="submit"><i class="fa fa-trash"></i> Usuń</button>
                 </form>
             </div>
+        </div>
+
+
+        <div class="post-image" th:if="${post.imagePath != null}">
+            <img th:src="@{'/uploads/' + ${post.imagePath}}" alt="Zdjęcie posta" style="max-width:100%; border-radius:8px; margin-top:12px;">
         </div>
         <p class="post-content" th:text="${post.content}"></p>
     </div>

@@ -8,16 +8,23 @@ import com.app.blog.service.PostService;
 import com.app.blog.model.Post;
 import com.app.blog.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import com.app.blog.repository.UserRepository;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.Instant;
 
 
 @Controller
@@ -38,6 +45,10 @@ public class PostWebController {
     @Autowired
     private CommentRepository commentRepository;
 
+    @Value("${upload.path}")
+    private String uploadDir;
+
+
     @GetMapping("/posts/new")
     public String showForm(Model model) {
         model.addAttribute("post", new Post());
@@ -45,22 +56,34 @@ public class PostWebController {
     }
 
     @PostMapping("/addPost")
-    public String submitForm(@ModelAttribute Post post) {
+    public String submitForm(@ModelAttribute Post post,
+                             @RequestParam("image") MultipartFile image,
+                             RedirectAttributes redirectAttributes) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-
-        // Pobieranie obiektu użytkownika na podstawie nazwy użytkownika
         User user = userRepository.findByUsername(username);
-
-        // Ustawienie użytkownika jako autora posta
         post.setUser(user);
+
+        // Obsługa przesyłania zdjęcia
+        if (!image.isEmpty()) {
+            try {
+                String fileName = Instant.now().toEpochMilli() + "_" + image.getOriginalFilename();
+                Path filePath = Paths.get(uploadDir, fileName);
+                Files.copy(image.getInputStream(), filePath);
+                post.setImagePath(fileName);
+            } catch (IOException e) {
+                redirectAttributes.addFlashAttribute("error", "Nie udało się przesłać zdjęcia.");
+                return "redirect:/posts/new";
+            }
+        }
+
         postRepository.save(post);
         return "redirect:/posts";
     }
 
     @GetMapping("/posts")
     public String showPosts(Model model) {
-        model.addAttribute("posts", postRepository.findAll());
+        model.addAttribute("posts", postRepository.findAll(Sort.by(Sort.Order.desc("createdAt"))));
         return "posts";
     }
 
