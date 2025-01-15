@@ -1,22 +1,20 @@
 package com.app.blog.controller;
 
-import com.app.blog.model.Comment;
-import com.app.blog.model.User;
-import com.app.blog.repository.CommentRepository;
+import com.app.blog.model.*;
+import com.app.blog.repository.*;
 import com.app.blog.service.CommentService;
 import com.app.blog.service.PostService;
-import com.app.blog.model.Post;
-import com.app.blog.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.access.prepost.PreAuthorize;
-import com.app.blog.repository.UserRepository;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -24,7 +22,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.Principal;
 import java.time.Instant;
+import java.util.List;
+import java.util.Map;
 
 
 @Controller
@@ -45,8 +46,13 @@ public class PostWebController {
     @Autowired
     private CommentRepository commentRepository;
 
+
     @Value("${upload.path}")
     private String uploadDir;
+    @Autowired
+    private PostLikeRepository postLikeRepository;
+    @Autowired
+    private PostDislikeRepository postDislikeRepository;
 
 
     @GetMapping("/posts/new")
@@ -110,7 +116,24 @@ public class PostWebController {
     @GetMapping("/posts/{id}")
     public String showPost(@PathVariable Long id, Model model) {
         Post post = postRepository.findById(id).orElseThrow();
+        int likeCount = postService.getLikeCount(post.getId());
+        int dislikeCount = postService.getDislikeCount(post.getId());
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
+        User user = userRepository.findByUsername(username);
+
+        boolean likedByUser = postLikeRepository.existsByUserAndPost(user, post);
+        boolean dislikedByUser = postDislikeRepository.existsByUserAndPost(user, post); // Jeśli masz oddzielną tabelę dla dislajków
+
+
+
         model.addAttribute("post", post);
+        model.addAttribute("likeCount", likeCount);
+        model.addAttribute("likedByUser", likedByUser);
+        model.addAttribute("dislikedByUser", dislikedByUser);
+        model.addAttribute("dislikeCount", dislikeCount);
         model.addAttribute("comment", new Comment());
 
         return "showPost";
@@ -131,6 +154,39 @@ public class PostWebController {
         comment.setPost(post);
         commentRepository.save(comment);
 
+        return "redirect:/posts/" + id;
+    }
+
+    @PostMapping("/posts/{id}/like")
+    public String toggleLike(@PathVariable Long id) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Post post = postRepository.findById(id).orElseThrow(() -> new RuntimeException("Nie znaleziono posta z id: " + id));
+        String username = authentication.getName();
+        User user = userRepository.findByUsername(username);
+
+        if (postDislikeRepository.existsByUserAndPost(user, post)) {
+            postService.toggleDislike(user, id);
+            postService.toggleLike(user, id);
+        }else{
+            postService.toggleLike(user, id);
+        }
+
+        return "redirect:/posts/" + id;
+    }
+
+    @PostMapping("/posts/{id}/dislike")
+    public String toggleDislike(@PathVariable Long id) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Post post = postRepository.findById(id).orElseThrow(() -> new RuntimeException("Nie znaleziono posta z id: " + id));
+        String username = authentication.getName();
+        User user = userRepository.findByUsername(username);
+
+        if (postLikeRepository.existsByUserAndPost(user, post)) {
+            postService.toggleLike(user, id);
+            postService.toggleDislike(user, id);
+        }else {
+            postService.toggleDislike(user, id);
+        }
         return "redirect:/posts/" + id;
     }
 }

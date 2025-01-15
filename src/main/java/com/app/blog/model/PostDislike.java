@@ -27,10 +27,13 @@ public class PostDislike {
     @JoinColumn(name = "post_id", nullable = false)
     private Post post;
 
-    @NotNull
-    @ColumnDefault("current_timestamp()")
-    @Column(name = "disliked_at", nullable = false)
+    @Column(name = "disliked_at", nullable = false, updatable = false)
     private Instant dislikedAt;
+
+    @PrePersist
+    protected void onDisliked() {
+        dislikedAt = Instant.now();
+    }
 
     public Long getId() {
         return id;

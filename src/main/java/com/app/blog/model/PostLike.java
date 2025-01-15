@@ -27,10 +27,13 @@ public class PostLike {
     @JoinColumn(name = "post_id", nullable = false)
     private Post post;
 
-    @NotNull
-    @ColumnDefault("current_timestamp()")
-    @Column(name = "liked_at", nullable = false)
+    @Column(name = "liked_at", nullable = false, updatable = false)
     private Instant likedAt;
+
+    @PrePersist
+    protected void onLiked() {
+        likedAt = Instant.now();
+    }
 
     public Long getId() {
         return id;
