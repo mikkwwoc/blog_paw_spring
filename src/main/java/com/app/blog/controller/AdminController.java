@@ -18,26 +18,23 @@ public class AdminController {
         this.userService = userService;
     }
 
-    // Wyświetlenie listy użytkowników
     @GetMapping("/users")
     public String listUsers(Model model) {
         List<User> users = userService.getAllUsers();
         model.addAttribute("users", users);
-        return "adminUsers"; // Przekierowanie do widoku Thymeleaf lub JSP
+        return "adminUsers";
     }
 
-    // Wyświetlenie formularza do zmiany roli
     @GetMapping("/users/{id}/edit")
     public String editUserRole(@PathVariable Long id, Model model) {
         model.addAttribute("userId", id);
         return "adminUsersEditRole";
     }
 
-    // Obsługa zmiany roli użytkownika
     @PostMapping("/users/{id}/edit")
     public String changeUserRole(@PathVariable Long id, @RequestParam("role") String roleName) {
         userService.changeUserRole(id, roleName);
-        return "redirect:/admin/users"; // Powrót do listy użytkowników
+        return "redirect:/admin/users";
     }
 
     @PostMapping("/{id}/delete")

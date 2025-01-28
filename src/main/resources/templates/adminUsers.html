@@ -1,47 +1,95 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="pl">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
+    <meta name="description" content="Lista użytkowników">
     <meta name="author" content="">
-    <link th:href="@{/vendor/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
+    <title>Lista Użytkowników</title>
 
-    <link rel="stylesheet" th:href="@{/css/fontawesome.css}">
-    <link rel="stylesheet" th:href="@{/css/style.css}">
-    <link rel="stylesheet" th:href="@{/css/owl.css}">
-    <link rel="stylesheet" th:href="@{/css/animate.css}">
-
-    <title>Rejestracja</title>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-blue-grey.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background-color: #f1f1f1;
+            margin: 0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+        }
+        h1 {
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        table th {
+            background-color: #f4f4f4;
+        }
+        a.button {
+            display: inline-block;
+            padding: 10px 15px;
+            text-decoration: none;
+            color: #fff;
+            background-color: #4CAF50;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        a.button:hover {
+            background-color: #45a049;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        ul li {
+            list-style: none;
+        }
+    </style>
 </head>
 <body>
-<!--<div th:insert="fragments/header :: header"></div>-->
-
-<h1>Lista Użytkowników</h1>
-<table border="1">
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>Nazwa Użytkownika</th>
-        <th>Email</th>
-        <th>Role</th>
-        <th>Akcje</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="user : ${users}">
-        <td th:text="${user.id}">1</td>
-        <td th:text="${user.username}">example</td>
-        <td th:text="${user.email}">example@email.com</td>
-        <td>
-            <ul>
-                <li th:each="role : ${user.role}" th:text="${role.name}">ROLE_USER</li>
-            </ul>
-        </td>
-        <td>
-            <a th:href="@{/admin/users/{id}/edit(id=${user.id})}">Zmień Rolę</a>
-        </td>
-    </tr>
-    </tbody>
-</table>
+<div class="container">
+    <h1>Lista Użytkowników</h1>
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nazwa Użytkownika</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Akcje</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="user : ${users}">
+            <td th:text="${user.id}">1</td>
+            <td th:text="${user.username}">example</td>
+            <td th:text="${user.email}">example@email.com</td>
+            <td>
+                <ul>
+                    <li th:each="role : ${user.role}" th:text="${role.name}">ROLE_USER</li>
+                </ul>
+            </td>
+            <td>
+                <a class="button" th:href="@{/admin/users/{id}/edit(id=${user.id})}"><i class="fa fa-edit"></i> Zmień Rolę</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
 </body>
 </html>

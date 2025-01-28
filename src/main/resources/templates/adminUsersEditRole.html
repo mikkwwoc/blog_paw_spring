@@ -1,32 +1,87 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="pl">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
+    <meta name="description" content="Zmień rolę użytkownika">
     <meta name="author" content="">
-    <link th:href="@{/vendor/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
+    <title>Zmień Rolę Użytkownika</title>
 
-    <link rel="stylesheet" th:href="@{/css/fontawesome.css}">
-    <link rel="stylesheet" th:href="@{/css/style.css}">
-    <link rel="stylesheet" th:href="@{/css/owl.css}">
-    <link rel="stylesheet" th:href="@{/css/animate.css}">
-
-    <title>Rejestracja</title>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-blue-grey.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background-color: #f1f1f1;
+            margin: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            text-align: center;
+        }
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 1rem;
+            color: #fff;
+            background-color: #4CAF50;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        a {
+            display: block;
+            margin-top: 20px;
+            text-decoration: none;
+            color: #fff;
+            background-color: #2196F3;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        a:hover {
+            background-color: #0b7dda;
+        }
+    </style>
 </head>
 <body>
-<!--<div th:insert="fragments/header :: header"></div>-->
-
-<h1>Zmień Rolę Użytkownika</h1>
-<form th:action="@{/admin/users/{id}/edit(id=${userId})}" method="post">
-    <label for="role">Wybierz nową rolę:</label>
-    <select name="role" id="role">
-        <option value="USER">USER</option>
-        <option value="ADMIN">ADMIN</option>
-        <option value="MODERATOR">MODERATOR</option>
-    </select>
-    <br><br>
-    <button type="submit">Zapisz Zmiany</button>
-</form>
-<a href="/admin/users">Powrót do listy</a>
+<div class="container">
+    <h1>Zmień Rolę Użytkownika</h1>
+    <form th:action="@{/admin/users/{id}/edit(id=${userId})}" method="post">
+        <label for="role">Wybierz nową rolę:</label>
+        <select name="role" id="role">
+            <option th:value="USER" th:text="'USER'"></option>
+            <option th:value="ADMIN" th:text="'ADMIN'"></option>
+            <option th:value="MODERATOR" th:text="'MODERATOR'"></option>
+        </select>
+        <button type="submit"><i class="fa fa-save"></i> Zapisz Zmiany</button>
+    </form>
+    <a th:href="@{/admin/users}"><i class="fa fa-arrow-left"></i> Powrót do listy</a>
+</div>
 </body>
 </html>

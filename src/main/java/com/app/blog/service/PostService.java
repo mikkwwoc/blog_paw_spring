@@ -4,11 +4,12 @@ import com.app.blog.model.User;
 import com.app.blog.model.Post;
 import com.app.blog.model.PostLike;
 import com.app.blog.model.PostDislike;
-import com.app.blog.repository.PostDislikeRepository;
-import com.app.blog.repository.PostLikeRepository;
-import com.app.blog.repository.PostRepository;
-import com.app.blog.repository.UserRepository;
+import com.app.blog.repository.*;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 
@@ -29,6 +30,8 @@ public class PostService {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private CommentRepository commentRepository;
 
     public List<Post> getAllPosts() {
         return postRepository.findAll();
@@ -42,9 +45,21 @@ public class PostService {
         return postRepository.save(post);
     }
 
+    public List<Post> getPostsByUser(Long userId) {
+        return postRepository.findAllByUserId(userId);
+    }
+
+    public List<Post> getPostsByUsername(String username) {
+        User user = userRepository.findByUsername(username);
+        return postRepository.findAllByUserId(user.getId());
+    }
+
+
+    @Transactional
     public void deletePost(Long id) {
         postLikeRepository.deleteByPostId(id);
-
+        postDislikeRepository.deleteByPostId(id);
+        commentRepository.deleteByPostId(id);
         postRepository.deleteById(id);
     }
 
@@ -98,6 +113,14 @@ public class PostService {
                 .orElseThrow(() -> new RuntimeException("Nie znaleziono posta o ID: " + postId));
         return postDislikeRepository.countByPost(post);
     }
-
-
+    public List<Post> getTop3PostsByLikes() {
+        Pageable top3Pageable = PageRequest.of(0, 3); // Pobierz 3 pierwsze wyniki
+        Page<Post> top3Posts = postRepository.findTop3ByOrderByLikeCountDesc(top3Pageable);
+        return top3Posts.getContent();
+    }
+    public List<Post> getTop3PostsByDislikes() {
+        Pageable top3Pageable = PageRequest.of(0, 3); // Pobierz 3 pierwsze wyniki
+        Page<Post> top3Posts = postRepository.findTop3ByOrderByDislikeCountDesc(top3Pageable);
+        return top3Posts.getContent();
+    }
 }

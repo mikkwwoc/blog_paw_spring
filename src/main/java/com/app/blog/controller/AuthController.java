@@ -19,7 +19,6 @@ public class AuthController {
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
 
-    //logger
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     public AuthController(UserRepository userRepository, PasswordEncoder passwordEncoder, RoleRepository roleRepository) {
@@ -46,7 +45,7 @@ public class AuthController {
         Role role = roleRepository.findByName("user");
         if (role == null) {
             logger.error("Brak roli 'user' w bazie danych!");
-            return "redirect:/error"; // Zwróć użytkownika na stronę błędu
+            return "redirect:/error";
         }
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));

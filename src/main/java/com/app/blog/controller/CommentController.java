@@ -3,10 +3,16 @@ package com.app.blog.controller;
 import com.app.blog.model.Comment;
 import com.app.blog.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.awt.print.Pageable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -16,9 +22,10 @@ public class CommentController {
     @Autowired
     private CommentService commentService;
 
+
     @GetMapping("/post/{postId}")
     public List<Comment> getCommentsByPostId(@PathVariable Long postId) {
-        return commentService.getCommentsByPostId(postId);
+        return commentService.getCommentsByPostIdSorted(postId);
     }
     @GetMapping
     public List<Comment> getAllComments() {

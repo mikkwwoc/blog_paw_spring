@@ -7,6 +7,7 @@ import com.app.blog.service.CommentService;
 import com.app.blog.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -43,6 +44,63 @@ public class PostController {
     private PostDislikeRepository postDislikeRepository;
 
 
+    @PostMapping("/{id}/like")
+    public ResponseEntity<Map<String, Object>> toggleLike(@PathVariable Long id) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        User user = userRepository.findByUsername(username);
+        Post post = postRepository.findById(id).orElseThrow(() -> new RuntimeException("Nie znaleziono posta"));
+
+
+        if (postLikeRepository.existsByUserAndPost(user, post)) {
+            postService.toggleLike(user, id);
+            postService.toggleDislike(user, id);
+        } else {
+            postService.toggleDislike(user, id);
+        }
+        int likeCount = postService.getLikeCount(post.getId());
+        int dislikeCount = postService.getDislikeCount(post.getId());
+        boolean likedByUser = postLikeRepository.existsByUserAndPost(user, post);
+        boolean dislikedByUser = postDislikeRepository.existsByUserAndPost(user, post);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("likeCount", likeCount);
+        response.put("dislikeCount", dislikeCount);
+        response.put("likedByUser", likedByUser);
+        response.put("dislikedByUser", dislikedByUser);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/{id}/dislike")
+    public ResponseEntity<Map<String, Object>> toggleDislike(@PathVariable Long id, Authentication authentication) {
+
+        String username = authentication.getName();
+        User user = userRepository.findByUsername(username);
+        Post post = postRepository.findById(id).orElseThrow(() -> new RuntimeException("Nie znaleziono posta"));
+
+        if (postLikeRepository.existsByUserAndPost(user, post)) {
+            postService.toggleLike(user, id);
+            postService.toggleDislike(user, id);
+        } else {
+            postService.toggleDislike(user, id);
+        }
+
+        int likeCount = postService.getLikeCount(post.getId());
+        int dislikeCount = postService.getDislikeCount(post.getId());
+        boolean likedByUser = postLikeRepository.existsByUserAndPost(user, post);
+        boolean dislikedByUser = postDislikeRepository.existsByUserAndPost(user, post);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("likeCount", likeCount);
+        response.put("dislikeCount", dislikeCount);
+        response.put("likedByUser", likedByUser);
+        response.put("dislikedByUser", dislikedByUser);
+
+        return ResponseEntity.ok(response);
+    }
+
+
     @GetMapping()
 
     public List<Post> getAllPersons() {
@@ -69,48 +127,5 @@ public class PostController {
         postService.deletePost(id);
     }
 
-    @PostMapping("/{id}/like")
-    @ResponseBody
-    public Map<String, Object> toggleLike(@PathVariable Long id) {
-        Post post = postRepository.findById(id).orElseThrow(() -> new RuntimeException("Nie znaleziono posta z id: " + id));
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-
-        User user = userRepository.findByUsername(username);
-
-        if (postDislikeRepository.existsByUserAndPost(user, post)) {
-            postService.toggleDislike(user, id);
-        }
-        postService.toggleLike(user, id);
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("likeCount", postService.getLikeCount(id));
-        response.put("dislikeCount", postService.getDislikeCount(id));
-        response.put("likedByUser", postLikeRepository.existsByUserAndPost(user, post));
-        response.put("dislikedByUser", postDislikeRepository.existsByUserAndPost(user, post));
-        return response;
-    }
-
-    @PostMapping("/{id}/dislike")
-    @ResponseBody
-    public Map<String, Object> toggleDislike(@PathVariable Long id) {
-        Post post = postRepository.findById(id).orElseThrow(() -> new RuntimeException("Nie znaleziono posta z id: " + id));
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-
-        User user = userRepository.findByUsername(username);
-
-        if (postLikeRepository.existsByUserAndPost(user, post)) {
-            postService.toggleLike(user, id);
-        }
-        postService.toggleDislike(user, id);
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("likeCount", postService.getLikeCount(id));
-        response.put("dislikeCount", postService.getDislikeCount(id));
-        response.put("likedByUser", postLikeRepository.existsByUserAndPost(user, post));
-        response.put("dislikedByUser", postDislikeRepository.existsByUserAndPost(user, post));
-        return response;
-    }
 
 }

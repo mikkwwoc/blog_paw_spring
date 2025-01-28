@@ -6,6 +6,10 @@ import com.app.blog.repository.CommentRepository;
 import com.app.blog.repository.PostRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,8 +31,10 @@ public class CommentService {
         return commentRepository.save(comment);
     }
 
-    public List<Comment> getCommentsByPostId(Long postId) {
-        return commentRepository.findByPostId(postId);
+
+    public List<Comment> getCommentsByPostIdSorted(Long postId) {
+        Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
+        return commentRepository.findAllByPostId(postId, sort);
     }
 
     public List<Comment> getAllComments() {
@@ -49,7 +55,10 @@ public class CommentService {
             return commentRepository.save(existingComment);
         });
     }
-
+    public Page<Comment> getPaginatedCommentsByPostId(Long postId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        return commentRepository.findByPostId(postId, pageable);
+    }
     public Comment saveComment(Comment comment) {
         return commentRepository.save(comment);
     }

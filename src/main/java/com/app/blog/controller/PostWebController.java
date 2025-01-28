@@ -6,9 +6,8 @@ import com.app.blog.service.CommentService;
 import com.app.blog.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -22,10 +21,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.Principal;
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 
 
 @Controller
@@ -70,7 +71,6 @@ public class PostWebController {
         User user = userRepository.findByUsername(username);
         post.setUser(user);
 
-        // Obsługa przesyłania zdjęcia
         if (!image.isEmpty()) {
             try {
                 String fileName = Instant.now().toEpochMilli() + "_" + image.getOriginalFilename();
@@ -93,7 +93,7 @@ public class PostWebController {
         return "posts";
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR', 'USER')")
     @GetMapping("/posts/edit/{id}")
     public String showEditForm(@PathVariable Long id, Model model) {
         model.addAttribute("post", postRepository.findById(id).get());
@@ -114,21 +114,33 @@ public class PostWebController {
     }
 
     @GetMapping("/posts/{id}")
-    public String showPost(@PathVariable Long id, Model model) {
+    public String showPost(
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            Model model) {
         Post post = postRepository.findById(id).orElseThrow();
         int likeCount = postService.getLikeCount(post.getId());
         int dislikeCount = postService.getDislikeCount(post.getId());
 
+
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
+        Page<Comment> commentPage = commentService.getPaginatedCommentsByPostId(id, page, size);
 
         User user = userRepository.findByUsername(username);
 
         boolean likedByUser = postLikeRepository.existsByUserAndPost(user, post);
-        boolean dislikedByUser = postDislikeRepository.existsByUserAndPost(user, post); // Jeśli masz oddzielną tabelę dla dislajków
+        boolean dislikedByUser = postDislikeRepository.existsByUserAndPost(user, post);
 
+        if (commentPage.isEmpty()) {
+            model.addAttribute("noComments", true);
+        }
 
-
+        model.addAttribute("comments", commentPage.getContent());
+        model.addAttribute("currentPage", commentPage.getNumber());
+        model.addAttribute("totalPages", commentPage.getTotalPages());
+        model.addAttribute("pageSize", commentPage.getSize());
         model.addAttribute("post", post);
         model.addAttribute("likeCount", likeCount);
         model.addAttribute("likedByUser", likedByUser);
@@ -189,4 +201,82 @@ public class PostWebController {
         }
         return "redirect:/posts/" + id;
     }
+    @GetMapping("/api/posts/sorted")
+    @ResponseBody
+    public List<Map<String, Object>> getSortedPosts(@RequestParam String sortBy) {
+
+        List<Post> posts;
+        switch (sortBy) {
+            case "newest":
+                posts = postRepository.findAllByOrderByCreatedAtDesc();
+                break;
+            case "oldest":
+                posts = postRepository.findAllByOrderByCreatedAtAsc();
+                break;
+            case "mostLiked":
+                posts = postRepository.findAllByOrderByLikesDesc();
+                break;
+            case "mostDisliked":
+                posts = postRepository.findAllByOrderByDislikesDesc();
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid sort parameter: " + sortBy);
+        }
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUsername = authentication != null && authentication.isAuthenticated()
+                ? authentication.getName()
+                : null;
+
+
+        return posts.stream().map(post -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", post.getId());
+            map.put("title", post.getTitle());
+            map.put("content", post.getContent());
+            map.put("createdAt", post.getCreatedAt());
+            map.put("authorName", post.getUser() != null ? post.getUser().getUsername() : "NIEZNANY UŻYTKOWNIK");
+            map.put("userId", post.getUser() != null ? post.getUser().getId() : null);
+            map.put("imagePath", post.getImagePath());
+            map.put("likeCount", postLikeRepository.countByPost(post));
+            map.put("dislikeCount", postDislikeRepository.countByPost(post));
+
+            boolean isEditable = false;
+            boolean isDeletable = false;
+
+            if (authentication != null && authentication.isAuthenticated()) {
+                boolean isAdminOrModerator = hasAnyRole(authentication, "ADMIN", "MODERATOR");
+
+                boolean isOwner = post.getUser() != null && post.getUser().getUsername().equals(currentUsername);
+
+                isEditable = isAdminOrModerator || isOwner;
+                isDeletable = isEditable;
+            }
+            map.put("isEditable", isEditable);
+            map.put("isDeletable", isDeletable);
+
+            return map;
+        }).toList();
+
+    }
+    private boolean hasAnyRole(Authentication authentication, String... roles) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return false;
+        }
+
+        for (String role : roles) {
+            if (authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_" + role))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @GetMapping("/users/{userId}/posts")
+    public String getPostsByUser(@PathVariable Long userId, Model model) {
+        List<Post> posts = postService.getPostsByUser(userId);
+        model.addAttribute("posts", posts);
+        model.addAttribute("userId", userId);
+        return "userPosts";
+    }
+
 }

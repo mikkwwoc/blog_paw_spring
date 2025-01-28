@@ -26,7 +26,7 @@ public class SecurityConfig {
                         .requestMatchers("/css/**", "/js/**", "/images/**", "/vendor/**", "/webfonts/**").permitAll()
                         .requestMatchers("/register", "/login", "/public/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/posts/edit/**", "/posts/delete/**").hasAnyRole("ADMIN", "MODERATOR")
+                        .requestMatchers("/posts/edit/**", "/posts/delete/**").hasAnyRole("ADMIN", "MODERATOR", "USER")
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form

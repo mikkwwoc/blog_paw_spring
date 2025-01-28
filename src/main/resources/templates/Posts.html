@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lista Postów</title>
+
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-blue-grey.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -75,37 +76,113 @@
     <div class="new-post-link">
         <a href="/posts/new"><i class="fa fa-plus"></i> Dodaj nowy post</a>
     </div>
-
-    <div th:each="post : ${posts}" class="post-card">
-        <div class="post-header">
-            <h3 class="post-title" th:text="${post.title}"></h3>
-            <p class="post-meta">
-                <span>Autor: </span>
-                <span th:text="${post.getAuthorName()}">NIEZNANY UŻYTKOWNIK</span>
-                <span>Data: </span>
-                <span th:text="${#temporals.format(post.getCreatedAt(), 'dd-MM-yyyy HH:mm')}"></span>
-            </p>
-            <div class="post-actions">
-                <a class="w3-button w3-small w3-theme-d1" th:href="@{'/posts/' + ${post.id}}"><i class="fa fa-eye"></i> Zobacz</a>
-                <a class="w3-button w3-small w3-theme-d3"
-                   th:href="@{'/posts/edit/' + ${post.id}}"
-                   sec:authorize="hasAnyRole('ADMIN', 'MODERATOR')">
-                    <i class="fa fa-pencil"></i> Edytuj
-                </a>
-                <form action="#" th:action="@{'/posts/delete/' + ${post.id}}" method="post" style="display:inline;"
-                      sec:authorize="hasAnyRole('ADMIN', 'MODERATOR')">
-                    <button class="w3-button w3-small w3-red" type="submit"><i class="fa fa-trash"></i> Usuń</button>
-                </form>
-            </div>
-        </div>
-
-
-        <div class="post-image" th:if="${post.imagePath != null}">
-            <img th:src="@{'/uploads/' + ${post.imagePath}}" alt="Zdjęcie posta" style="max-width:100%; border-radius:8px; margin-top:12px;">
-        </div>
-        <p class="post-content" th:text="${post.content}"></p>
+    <div class="sort-buttons">
+        <button class="w3-button w3-theme-d3" onclick="fetchPosts('newest')">Najnowsze</button>
+        <button class="w3-button w3-theme-d3" onclick="fetchPosts('oldest')">Najstarsze</button>
+        <button class="w3-button w3-theme-d3" onclick="fetchPosts('mostLiked')">Najwięcej lajków</button>
+        <button class="w3-button w3-theme-d3" onclick="fetchPosts('mostDisliked')">Najwięcej dislajków</button>
     </div>
 </div>
+<div class="posts-container" id="post-container">
+<!--    <div th:each="post : ${posts}" class="post-card">-->
+<!--        <div class="post-header">-->
+<!--            <h3 class="post-title" th:text="${post.title}"></h3>-->
+<!--            <p class="post-meta">-->
+<!--                <span>Autor: </span>-->
+<!--                <span th:text="${post.getAuthorName()}">NIEZNANY UŻYTKOWNIK</span>-->
+<!--                <span>Data: </span>-->
+<!--                <span th:text="${#temporals.format(post.getCreatedAt(), 'dd-MM-yyyy HH:mm')}"></span>-->
+<!--            </p>-->
+<!--            <div class="post-actions">-->
+<!--                <a class="w3-button w3-small w3-theme-d1" th:href="@{'/posts/' + ${post.id}}"><i class="fa fa-eye"></i> Zobacz</a>-->
+<!--                <a class="w3-button w3-small w3-theme-d3"-->
+<!--                   th:href="@{'/posts/edit/' + ${post.id}}"-->
+<!--                   sec:authorize="hasAnyRole('ADMIN', 'MODERATOR')">-->
+<!--                    <i class="fa fa-pencil"></i> Edytuj-->
+<!--                </a>-->
+<!--                <form action="#" th:action="@{'/posts/delete/' + ${post.id}}" method="post" style="display:inline;"-->
+<!--                      sec:authorize="hasAnyRole('ADMIN', 'MODERATOR')">-->
+<!--                    <button class="w3-button w3-small w3-red" type="submit"><i class="fa fa-trash"></i> Usuń</button>-->
+<!--                </form>-->
+<!--            </div>-->
+<!--        </div>-->
 
+
+<!--        <div class="post-image" th:if="${post.imagePath != null}">-->
+<!--            <img th:src="@{'/uploads/' + ${post.imagePath}}" alt="Zdjęcie posta" style="max-width:100%; border-radius:8px; margin-top:12px;">-->
+<!--        </div>-->
+<!--        <p class="post-content" th:text="${post.content}"></p>-->
+<!--&lt;!&ndash;        <p class="post-stats">&ndash;&gt;-->
+<!--&lt;!&ndash;            <span>Polubienia: <span th:text="${post.likeCount}">0</span></span> |&ndash;&gt;-->
+<!--&lt;!&ndash;            <span>Dyslajki: <span th:text="${post.dislikeCount}">0</span></span>&ndash;&gt;-->
+<!--&lt;!&ndash;        </p>&ndash;&gt;-->
+<!--    </div>-->
+</div>
+
+<script>
+    function fetchPosts(sortBy) {
+        fetch(`/api/posts/sorted?sortBy=${sortBy}`)
+            .then(response => response.json())
+            .then(posts => {
+                console.log(posts);
+                const postsContainer = document.querySelector('#post-container');
+                postsContainer.innerHTML = '';
+
+                if (Array.isArray(posts)) {
+                    posts.forEach(post => {
+                        const postCard = document.createElement('div');
+                        postCard.classList.add('post-card');
+                        postCard.innerHTML = `
+                        <div class="post-header">
+                            <h3 class="post-title">${post.title}</h3>
+                            <p class="post-meta">
+                                <span>Autor: </span>
+                                <a href="/users/${post.userId}/posts" class="author-link">${post.authorName || 'NIEZNANY UŻYTKOWNIK'}</a>
+                                <span>Data: </span>
+                                <span>${new Date(post.createdAt).toLocaleString()}</span>
+                            </p>
+                        </div>
+
+                        ${post.imagePath ? `
+                        <div class="post-image">
+                            <img src="/uploads/${post.imagePath}" alt="Zdjęcie posta" style="max-width:100%; border-radius:8px; margin-top:12px;">
+                        </div>` : ''}
+
+                        <p class="post-content">${post.content}</p>
+                        <p class="post-stats">
+                            <span>Polubienia: ${post.likeCount}</span> |
+                            <span>Dislajki: ${post.dislikeCount}</span>
+                        </p>
+
+                        <!-- Przyciski akcji -->
+                        <div class="post-actions">
+                            <a class="w3-button w3-small w3-theme-d1" href="/posts/${post.id}">
+                                <i class="fa fa-eye"></i> Zobacz
+                            </a>
+                            ${post.isEditable ? `
+                            <a class="w3-button w3-small w3-theme-d3" href="/posts/edit/${post.id}">
+                                <i class="fa fa-pencil"></i> Edytuj
+                            </a>` : ''}
+                            ${post.isDeletable ? `
+                            <form action="/posts/delete/${post.id}" method="post" style="display:inline;">
+                                <button class="w3-button w3-small w3-red" type="submit">
+                                    <i class="fa fa-trash"></i> Usuń
+                                </button>
+                            </form>` : ''}
+                        </div>
+                    `;
+                        postsContainer.appendChild(postCard);
+                    });
+                } else {
+                    console.error('Odpowiedź nie jest tablicą:', posts);
+                }
+            });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        fetchPosts('newest');
+    });
+
+</script>
 </body>
 </html>

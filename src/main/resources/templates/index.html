@@ -1,48 +1,177 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
-    <title>W3.CSS Template</title>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strona główna</title>
+
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-blue-grey.css">
-    <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Open+Sans'>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <style>
         body {
             font-family: 'Open Sans', sans-serif;
             background-color: #f1f1f1;
         }
-        .login-container {
-            max-width: 400px;
-            margin: 50px auto;
-            padding: 20px;
-            background-color: #ffffff;
+        .posts-container {
+            max-width: 800px;
+            margin: 20px auto;
+        }
+        .post-card {
+            background-color: #fff;
             box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
             border-radius: 8px;
-        }
-        .login-header {
-            text-align: center;
+            padding: 16px;
             margin-bottom: 20px;
         }
-        .w3-button {
-            width: 100%;
+        .post-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        .login-footer {
+        .post-title {
+            margin: 0;
+            font-size: 1.5em;
+        }
+        .post-meta {
+            font-size: 0.9em;
+            color: #777;
+        }
+        .post-content {
+            margin-top: 12px;
+            color: #555;
+        }
+        h2 {
+            margin-top: 40px;
+            font-size: 1.8em;
             text-align: center;
-            margin-top: 10px;
         }
-        .login-footer a {
+        hr {
+            border: 0;
+            height: 1px;
+            background: #ddd;
+            margin: 16px 0;
+        }
+        .back-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .back-link a {
             text-decoration: none;
+            font-size: 1em;
             font-weight: bold;
+            color: #ffffff;
+            background-color: #4CAF50;
+            padding: 10px 20px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        .back-link a:hover {
+            background-color: #45a049;
+        }
+        .margin-top-6ch {
+            margin-top:6ch;
         }
     </style>
 </head>
 <body>
+
 <div th:insert="fragments/header :: header"></div>
-<h1 th:text="${message}"></h1>
-<h2>Pisz posty, komentuj itp</h2>
-<br><br>
-<a th:href="@{'/posts'}">Zobacz wszystkie posty</a>
+
+<div class="w3-container w3-theme-d4 w3-padding-16 margin-top-6ch">
+    <h1 class="w3-center">Strona główna</h1>
+</div>
+
+<div class="posts-container">
+    <h2>Ostatnie 3 posty, które napisałeś</h2>
+    <div th:each="post : ${userPosts}" class="post-card">
+        <div class="post-header">
+            <h3 class="post-title" th:text="${post.title}"></h3>
+            <p class="post-meta">
+                <span>Autor: </span>
+                <a th:href="@{'/users/' + ${post.user.id} + '/posts'}" th:text="${post.authorName}">NIEZNANY UŻYTKOWNIK</a>
+                <br>
+                <span>Data: </span>
+                <span th:text="${#temporals.format(post.createdAt, 'dd-MM-yyyy HH:mm')}"></span>
+            </p>
+        </div>
+        <p class="post-content" th:text="${post.content}"></p>
+        <div class="post-image" th:if="${post.imagePath != null}">
+            <img th:src="@{'/uploads/' + ${post.imagePath}}" alt="Zdjęcie posta" style="max-width:100%; border-radius:8px; margin-top:12px;">
+        </div>
+        <hr>
+        <div class="post-actions">
+            <a class="w3-button w3-small w3-theme-d1" th:href="@{'/posts/' + ${post.id}}"><i class="fa fa-eye"></i> Zobacz</a>
+        </div>
+    </div>
+
+    <h2>Najlepsze posty na portalu</h2>
+    <div th:each="post : ${topLikedPosts}" class="post-card">
+        <div class="post-header">
+            <h3 class="post-title" th:text="${post.title}"></h3>
+            <p class="post-meta">
+                <span>Autor: </span>
+                <a th:href="@{'/users/' + ${post.user.id} + '/posts'}" th:text="${post.authorName}">NIEZNANY UŻYTKOWNIK</a>
+                <br>
+                <span>Data: </span>
+                <span th:text="${#temporals.format(post.createdAt, 'dd-MM-yyyy HH:mm')}"></span>
+            </p>
+        </div>
+        <p class="post-content" th:text="${post.content}"></p>
+                <div class="post-image" th:if="${post.imagePath != null}">
+                    <img th:src="@{'/uploads/' + ${post.imagePath}}" alt="Zdjęcie posta" style="max-width:100%; border-radius:8px; margin-top:12px;">
+                </div>
+        <!--            <div class="post-actions">-->
+        <!--                <a class="w3-button w3-small w3-theme-d1" th:href="@{'/posts/' + ${post.id}}"><i class="fa fa-eye"></i> Zobacz</a>-->
+        <!--                <a class="w3-button w3-small w3-theme-d3"-->
+        <!--                   th:href="@{'/posts/edit/' + ${post.id}}"-->
+        <!--                   sec:authorize="hasAnyRole('ADMIN', 'MODERATOR')">-->
+        <!--                    <i class="fa fa-pencil"></i> Edytuj-->
+        <!--                </a>-->
+        <!--                <form action="#" th:action="@{'/posts/delete/' + ${post.id}}" method="post" style="display:inline;"-->
+        <!--                      sec:authorize="hasAnyRole('ADMIN', 'MODERATOR')">-->
+        <!--                    <button class="w3-button w3-small w3-red" type="submit"><i class="fa fa-trash"></i> Usuń</button>-->
+        <!--                </form>-->
+        <!--            </div>-->
+        <!--        </div>-->
+
+
+        <!--        <div class="post-image" th:if="${post.imagePath != null}">-->
+        <!--            <img th:src="@{'/uploads/' + ${post.imagePath}}" alt="Zdjęcie posta" style="max-width:100%; border-radius:8px; margin-top:12px;">-->
+        <!--        </div>-->
+        <hr>
+        <div class="post-actions">
+            <a class="w3-button w3-small w3-theme-d1" th:href="@{'/posts/' + ${post.id}}"><i class="fa fa-eye"></i> Zobacz</a>
+        </div>
+    </div>
+
+    <h2>Najgorsze posty na portalu</h2>
+    <div th:each="post : ${topDislikedPosts}" class="post-card">
+        <div class="post-header">
+            <h3 class="post-title" th:text="${post.title}"></h3>
+            <p class="post-meta">
+                <span>Autor: </span>
+                <a th:href="@{'/users/' + ${post.user.id} + '/posts'}" th:text="${post.authorName}">NIEZNANY UŻYTKOWNIK</a>
+                <br>
+                <span>Data: </span>
+                <span th:text="${#temporals.format(post.createdAt, 'dd-MM-yyyy HH:mm')}"></span>
+            </p>
+        </div>
+        <p class="post-content" th:text="${post.content}"></p>
+                <div class="post-image" th:if="${post.imagePath != null}">
+                    <img th:src="@{'/uploads/' + ${post.imagePath}}" alt="Zdjęcie posta" style="max-width:100%; border-radius:8px; margin-top:12px;">
+                </div>
+
+            <hr>
+        <div class="post-actions">
+            <a class="w3-button w3-small w3-theme-d1" th:href="@{'/posts/' + ${post.id}}"><i class="fa fa-eye"></i> Zobacz</a>
+        </div>
+    </div>
+
+    <div class="back-link">
+        <a th:href="@{'/posts'}"><i class="fa fa-arrow-left"></i> Zobacz wszystkie posty</a>
+    </div>
+</div>
+
 </body>
 </html>
